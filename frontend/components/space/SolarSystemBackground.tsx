@@ -11,6 +11,11 @@ import { SunMaterial } from './materials/SunMaterial';
 import { NeptuneMaterial } from './materials/NeptuneMaterial';
 import { JupiterMaterial } from './materials/JupiterMaterial';
 import { SaturnMaterial } from './materials/SaturnMaterial';
+import { MercuryMaterial } from './materials/MercuryMaterial';
+import { VenusMaterial } from './materials/VenusMaterial';
+import { EarthMaterial } from './materials/EarthMaterial';
+import { MarsMaterial } from './materials/MarsMaterial';
+import { UranusMaterial } from './materials/UranusMaterial';
 
 // Textured, orbiting planet with optional normal/specular maps and rings
 function TexturedPlanet({
@@ -48,7 +53,7 @@ function TexturedPlanet({
   cloudsSpeed?: number;
   fallbackColor?: string;
   glowColor?: string;
-  materialType?: 'neptune' | 'jupiter' | 'saturn' | undefined;
+  materialType?: 'mercury' | 'venus' | 'earth' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | undefined;
 }) {
   const groupRef = useRef<THREE.Group>(null!);
   const cloudsRef = useRef<THREE.Mesh>(null!);
@@ -109,16 +114,31 @@ function TexturedPlanet({
     <group ref={groupRef} rotation={[0, tilt, 0]}>
       <mesh castShadow receiveShadow>
         <sphereGeometry args={[radius, 64, 64]} />
-        {/* If a procedural material is specified, use it */}
-        {materialType === 'neptune' ? (
-          <NeptuneMaterial />
+        {/* Force the material to be visible by setting opacity to 1.0 */}
+        {materialType === 'mercury' ? (
+          <MercuryMaterial />
+        ) : materialType === 'venus' ? (
+          <VenusMaterial />
+        ) : materialType === 'earth' ? (
+          <EarthMaterial />
+        ) : materialType === 'mars' ? (
+          <MarsMaterial />
         ) : materialType === 'jupiter' ? (
           <JupiterMaterial />
         ) : materialType === 'saturn' ? (
           <SaturnMaterial />
+        ) : materialType === 'uranus' ? (
+          <UranusMaterial />
+        ) : materialType === 'neptune' ? (
+          <NeptuneMaterial />
         ) : (
-          // Otherwise, use unlit texture material with fallback color always applied
-          <meshBasicMaterial map={colorMap} color={new THREE.Color(fallbackColor ?? '#888888')} />
+          // Fallback to standard material if no specific material type is specified
+          <meshStandardMaterial 
+            map={colorMap} 
+            color={new THREE.Color(fallbackColor ?? '#888888')} 
+            roughness={0.7}
+            metalness={0.3}
+          />
         )}
       </mesh>
       {glowColor && (
@@ -154,14 +174,14 @@ export function SolarSystemBackground() {
   // Define planet configs once
   const planets = useMemo(
     () => [
-      // No external textures — all procedural/fallback to avoid CORS
-      { name: 'Mercury', radius: 0.25, distance: 4, speed: 1.2, initialAngle: 0.0, fallbackColor: '#9e9e9e' },
-      { name: 'Venus', radius: 0.35, distance: 6, speed: 0.9, initialAngle: 1.0, fallbackColor: '#cdb28a' },
-      { name: 'Earth', radius: 0.5, distance: 8.5, speed: 0.7, initialAngle: 2.0, tilt: 0.41, fallbackColor: '#3a78ff', glowColor: '#9fd3ff' },
-      { name: 'Mars', radius: 0.4, distance: 11, speed: 0.6, initialAngle: 3.0, fallbackColor: '#c4553b' },
-      { name: 'Jupiter', radius: 1.2, distance: 15, speed: 0.35, initialAngle: 0.7, fallbackColor: '#d1a67a', glowColor: '#ffd9a8' },
-      { name: 'Saturn', radius: 1.0, distance: 20, speed: 0.3, initialAngle: 1.7, tilt: 0.47, fallbackColor: '#e3cfa3', glowColor: '#ffe8b8', ringInner: 1.5, ringOuter: 2.6 },
-      { name: 'Uranus', radius: 0.85, distance: 24, speed: 0.25, initialAngle: 0.4, tilt: -1.0, fallbackColor: '#7fd6e7', glowColor: '#b7f0ff' },
+      // All planets now use procedural materials
+      { name: 'Mercury', radius: 0.25, distance: 4, speed: 1.2, initialAngle: 0.0, materialType: 'mercury', fallbackColor: '#9e9e9e' },
+      { name: 'Venus', radius: 0.35, distance: 6, speed: 0.9, initialAngle: 1.0, materialType: 'venus', fallbackColor: '#cdb28a' },
+      { name: 'Earth', radius: 0.5, distance: 8.5, speed: 0.7, initialAngle: 2.0, tilt: 0.41, materialType: 'earth', fallbackColor: '#3a78ff', glowColor: '#9fd3ff' },
+      { name: 'Mars', radius: 0.4, distance: 11, speed: 0.6, initialAngle: 3.0, materialType: 'mars', fallbackColor: '#c4553b' },
+      { name: 'Jupiter', radius: 1.2, distance: 15, speed: 0.35, initialAngle: 0.7, materialType: 'jupiter', fallbackColor: '#d1a67a', glowColor: '#ffd9a8' },
+      { name: 'Saturn', radius: 1.0, distance: 20, speed: 0.3, initialAngle: 1.7, tilt: 0.47, materialType: 'saturn', fallbackColor: '#e3cfa3', glowColor: '#ffe8b8', ringInner: 1.5, ringOuter: 2.6 },
+      { name: 'Uranus', radius: 0.85, distance: 24, speed: 0.25, initialAngle: 0.4, tilt: -1.0, materialType: 'uranus', fallbackColor: '#7fd6e7', glowColor: '#b7f0ff' },
       { name: 'Neptune', radius: 0.8, distance: 28, speed: 0.22, initialAngle: 1.1, tilt: 0.49, materialType: 'neptune', fallbackColor: '#2e6cf6', glowColor: '#6aa7ff' },
     ],
     []
@@ -203,27 +223,28 @@ export function SolarSystemBackground() {
       {/* Star Field */}
       <Stars radius={150} depth={80} count={8000} factor={4.5} saturation={0} fade speed={1} />
 
-      {/* Sun/Center - Animated shader + corona */}
+      {/* Sun/Center - Animated shader */}
       <group>
         {/* Animated Sun surface */}
         <mesh position={[0, 0, 0]}>
           <sphereGeometry args={[3, 96, 96]} />
           <SunMaterial colorA="#FF6A00" colorB="#FFD54D" />
         </mesh>
-        {/* Corona glow */}
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[5.8, 48, 48]} />
-          <meshBasicMaterial color="#ffdd77" transparent opacity={0.18} blending={THREE.AdditiveBlending} />
-        </mesh>
+        {/* Corona glow removed as requested */}
       </group>
 
+      {/* Add strong lighting for the scene */}
+      <ambientLight intensity={1.5} />
+      <directionalLight position={[10, 10, 5]} intensity={2} castShadow />
+      <hemisphereLight args={['#ffffff', '#004080', 1]} />
+      
       {/* Orbits and Planets */}
       {planets.map((p: any, idx) => (
         <group key={idx}>
           {/* Orbit ring */}
           <mesh rotation-x={-Math.PI / 2} receiveShadow>
             <ringGeometry args={[p.distance - 0.05, p.distance + 0.05, 256]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={1.0} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
           </mesh>
           {/* Animated planet */}
           <TexturedPlanet
@@ -238,6 +259,9 @@ export function SolarSystemBackground() {
             ringInner={p.ringInner}
             ringOuter={p.ringOuter}
             tilt={p.tilt}
+            materialType={p.materialType}
+            fallbackColor={p.fallbackColor}
+            glowColor={p.glowColor}
           />
           {/* Optional: add a thin atmospheric glow for Earth-like planet */}
           {idx === 2 && (

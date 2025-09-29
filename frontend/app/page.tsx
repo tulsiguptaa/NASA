@@ -12,16 +12,28 @@ export default function KnowledgeDashboard() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-8 text-white relative z-10 font-sans">
       
-      {/* ----------------- HEADER & TITLE ----------------- */}
-      <header className="text-center mb-16 pt-20">
-        <h1 className="text-8xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-nasa-blue to-tech-cyan mb-4 drop-shadow-lg [text-shadow:0_0_15px_#00FFFF]">
-          BIOAstra
-        </h1>
-        <p className="text-2xl text-gray-400 mb-2 uppercase tracking-widest">
+      {/* ----------------- ADVANCED HEADER & TITLE ----------------- */}
+      <header className="relative text-center mb-20 pt-20 overflow-hidden">
+        {/* Main title with clean, elegant styling */}
+        <div className="relative py-4">
+          <h1 className="text-8xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-nasa-blue via-tech-cyan to-nasa-blue mb-6">
+            BIOAstra
+          </h1>
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-40 h-0.5 bg-tech-cyan/70"></div>
+        </div>
+        
+        {/* Subtitle with minimal styling */}
+        <p className="text-2xl text-white mb-4 uppercase tracking-wider">
           Space Biology Knowledge Engine
         </p>
-        <p className="text-lg text-tech-cyan/70">
-          Synthesizing decades of NASA bioscience for **Artemis** and **Mars** exploration.
+        
+        {/* Description with clean styling */}
+        <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+          Synthesizing decades of NASA bioscience for 
+          <span className="font-bold text-tech-cyan mx-1">Artemis</span> 
+          and 
+          <span className="font-bold text-nasa-red mx-1">Mars</span> 
+          exploration.
         </p>
       </header>
 
