@@ -1,20 +1,20 @@
 // frontend/app/layout.tsx
 import './globals.css';
-// 1. Correct the import path to the new wrapper
+// Import the background wrapper and our new Navbar
 import DynamicBackgroundWrapper from '@/components/space/DynamicBackgroundWrapper'; 
-import Navigation from '@/components/layout/Navigation';
+import Navbar from '@/components/layout/Navbar';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="bg-space-dark text-white font-sans antialiased">
         
-        {/* 2. Replace the direct component import with the wrapper */}
+        {/* Background wrapper */}
         <DynamicBackgroundWrapper />
 
-        {/* Remove blur and dark overlay to make background fully visible */}
+        {/* Content with navbar */}
         <div className="relative z-10 min-h-screen">
-          <Navigation />
+          <Navbar />
           <main className="p-4 md:p-8 pt-24"> 
             {children}
           </main>
